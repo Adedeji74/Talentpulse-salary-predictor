@@ -5,6 +5,7 @@ import numpy as np
 import re
 import os
 
+
 # Load saved model files
 model = joblib.load("salary_model.pkl")
 encoder = joblib.load("salary_encoder.pkl")
@@ -26,6 +27,7 @@ def calculate_title_rank(title):
 
     return 1
 
+
 # Connect user inputs to the trained model
 def predict_salary(
     job_title, job_category, country, job_level,
@@ -33,7 +35,6 @@ def predict_salary(
     machine_learning, python, sql, excel,
     aws, power_bi, spark, tableau
 ):
-
     if not job_title or not job_category or not country or not job_level or not education:
         raise gr.Error("Please complete all job information.")
 
@@ -79,7 +80,7 @@ def predict_salary(
         "skill_tableau": int(tableau)
     }])
 
-    # Combine and arrange the exact 26 model features
+    # Combine and arrange the exact model features
     input_data = pd.concat([numeric_df, encoded_df], axis=1)
     input_data = input_data.reindex(columns=model_columns, fill_value=0)
 
@@ -96,11 +97,18 @@ with gr.Blocks(title="TalentPulse Analytics") as demo:
     gr.Markdown("### Global Salary Prediction")
 
     with gr.Row():
-        job_title = gr.Textbox(label="Full Job Title",
-                               placeholder="e.g. Senior Data Scientist")
+        job_title = gr.Textbox(
+            label="Full Job Title",
+            placeholder="e.g. Senior Data Scientist"
+        )
         job_category = gr.Dropdown(
-            ["business analyst", "data analyst", "data engineer",
-             "data scientist", "machine learning engineer"],
+            [
+                "business analyst",
+                "data analyst",
+                "data engineer",
+                "data scientist",
+                "machine learning engineer"
+            ],
             label="Job Category"
         )
 
@@ -115,14 +123,24 @@ with gr.Blocks(title="TalentPulse Analytics") as demo:
         )
 
     with gr.Row():
-        experience = gr.Number(label="Years of Experience", value=3)
+        experience = gr.Number(
+            label="Years of Experience",
+            value=3
+        )
         education = gr.Dropdown(
             ["Bachelor", "Master", "Not specified"],
             label="Education"
         )
+        remote = gr.Radio(
+            [0, 1],
+            value=0,
+            label="Remote Work (0 = No, 1 = Yes)"
+        )
 
-         remote = gr.Radio([0, 1], value=0, label="Remote Work (0 = No, 1 = Yes)")
-    num_skills = gr.Number(label="Total Number of Skills", value=3)
+    num_skills = gr.Number(
+        label="Total Number of Skills",
+        value=3
+    )
 
     gr.Markdown("### Select Your Skills")
 
@@ -152,8 +170,9 @@ with gr.Blocks(title="TalentPulse Analytics") as demo:
         outputs=result
     )
 
+
+# Launch the app on Render
 demo.launch(
     server_name="0.0.0.0",
     server_port=int(os.environ.get("PORT", 10000))
 )
-#demo.launch()
